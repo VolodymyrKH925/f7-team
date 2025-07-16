@@ -2,6 +2,7 @@ from collections import UserDict
 from datetime import datetime, timedelta
 import command_handler as handler
 import pickle
+from notes import *
 
 class Field:
     def __init__(self, value):
@@ -128,6 +129,9 @@ def save_data(book, filename="addressbook.pkl"):
 
 def main():
     book = load_data()
+    # load notes
+    notes = load_data_notes()
+
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
@@ -165,6 +169,29 @@ def main():
 
         elif command == "birthdays":
             print(handler.birthdays(book))
+
+        # notes commands
+        
+        elif command == "add-note":
+            print(add_note(args, notes))
+
+        elif command == "delete-note":
+            print(delete_note(args, notes))
+
+        elif command == "search-note-tag":
+            print(search_note_tag(args, notes))
+
+        elif command == "show-notes":
+            print(show_notes(notes))
+
+        elif command == "edit-note":
+            print(edit_note(args, notes))
+
+        elif command == "search-note-tag":
+            print(search_note_tag(args, notes))
+
+        elif command == "sort-by-tag":
+            print(sort_by_tag(notes))
 
         else:
             print("Invalid command.")
