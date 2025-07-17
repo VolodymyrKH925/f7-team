@@ -1,5 +1,7 @@
 .venv/
+venv/
 .env/
 build/
 __pycache__/
 *egg-info/
+addressbook.pkl
