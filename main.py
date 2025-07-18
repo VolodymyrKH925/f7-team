@@ -95,6 +95,8 @@ class Record:
     def add_birthday(self, value):
         self.birthday = Birthday(value)
 
+    def remove_phone(self, phone_str: str):
+        self.phones = [p for p in self.phones if str(p) != phone_str]
 
     def add_email(self, value):
         self.email = Email(value)
@@ -244,7 +246,8 @@ def main():
             print(handler.add_contact(book))
 
         elif command == "change":
-            print(handler.change_contact(args, book))
+            # print(handler.change_contact(args, book))
+            handler.change_contact(book)          
 
         elif command == "phone":
             print(handler.show_phone(args, book))
@@ -256,8 +259,11 @@ def main():
                 for record in book.values():
                     print(record)
 
+        elif command == "delete":
+            handler.delete_contact(book)         
+
         elif command == "search":
-            search_menu(book)             
+            search_menu(book)
 
         elif command == "add-birthday":
             print(handler.add_birthday(args, book))
@@ -273,12 +279,6 @@ def main():
 
         elif command == "add-address":
             print(handler.add_address(args, book))
-
-
-        # search command
-        elif command == "search":
-            search_menu(book)  
-
 
         # notes commands
         
