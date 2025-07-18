@@ -3,6 +3,13 @@ from datetime import datetime, timedelta
 import command_handler as handler
 import pickle
 from notes import *
+from search_contacts import (
+    search_contacts_by_name,
+    search_contacts_by_phone,
+    search_contacts_by_email,
+    search_contacts_by_birthday,
+    search_contacts_by_address,
+)
 
 class Field:
     def __init__(self, value):
@@ -127,6 +134,51 @@ def save_data(book, filename="addressbook.pkl"):
     with open(filename, "wb") as f:
         pickle.dump(book, f)
 
+ # Пошук у книзі контактів
+def print_record(record):
+    print(f"\n👤 {record.name}")
+    print(f"📞 Phones: {', '.join(p.value for p in record.phones)}")
+    print(f"📧 Email: {record.email if record.email else '-'}")
+    print(f"🎂 Birthday: {record.birthday if record.birthday else '-'}")
+    print(f"🏡 Address: {record.address if record.address else '-'}")
+    print("-" * 30)
+
+def search_menu(book):
+    while True:
+        print("\n🔍 Search by:")
+        print("  name | phone | email | birthday | address")
+        print("  back - to return")
+
+        command = input("🔎 Enter search type: ").strip().lower()
+
+        if command == "name":
+            query = input("🔤 Enter name: ")
+            results = search_contacts_by_name(query, book.data)
+        elif command == "phone":
+            query = input("📞 Enter phone: ")
+            results = search_contacts_by_phone(query, book.data)
+        elif command == "email":
+            query = input("📧 Enter email: ")
+            results = search_contacts_by_email(query, book.data)
+        elif command == "birthday":
+            query = input("🎂 Enter birthday (dd.mm): ")
+            results = search_contacts_by_birthday(query, book.data)
+        elif command == "address":
+            query = input("🏘 Enter address part: ")
+            results = search_contacts_by_address(query, book.data)
+        elif command == "back":
+            break
+        else:
+            print("⚠️ Unknown search type.")
+            continue
+
+        if results:
+            print(f"\n✅ Found {len(results)} contact(s):")
+            for r in results:
+                print_record(r)
+        else:
+            print("❌ No matches found.")        
+
 def main():
     book = load_data()
     # load notes
@@ -160,6 +212,9 @@ def main():
             else:
                 for record in book.values():
                     print(record)
+
+        elif command == "search":
+            search_menu(book)             
 
         elif command == "add-birthday":
             print(handler.add_birthday(args, book))
