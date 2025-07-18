@@ -1,4 +1,4 @@
-from main import AddressBook, Record
+from main import AddressBook, Record, Email
 
 
 def input_error(func):
@@ -15,24 +15,57 @@ def input_error(func):
 
 
 @input_error
-def add_contact(args, book: AddressBook):
-    name, phone, *_ = args
+def add_contact(book: AddressBook):
+    name = input('Enter contact name: ').strip()
+    if not name:
+        return "Name cannot be empty."
     record = book.find(name)
-    message = "Contact updated."
 
     if record is None:
         record = Record(name)
-        book.add_record(record)
-        message = "Contact added."
-    if phone:
-        record.add_phone(phone)
-    return message
+    
+    while True:
+        phone = input('Enter phone number (or press Enter to skip/stop): ').strip()
+        if not phone:
+            break
+        try:
+            record.add_phone(phone)
+            print('Phone added')
+        except ValueError as e:
+                print(f"Invalid phone: {e}")
+    
+    email = prompt_validated_input(
+        "Enter email (or press Enter to skip): ",
+        lambda val: Email(val),
+        "Invalid email format"
+        )
+
+    if email:
+        record.email = email
+    
+    bday = input("Enter birthday (DD.MM.YYYY) (or press Enter to skip): ").strip()
+
+    if bday:
+        try:
+            record.add_birthday(bday)
+        except ValueError as e:
+            print(f"Invalid birthday: {e}")
+    
+    address = input("Enter address (or press Enter to skip): ").strip()
+    if address:
+        record.add_address(address)
+        print('Address added.')
+    
+    book.add_record(record)
+
+    return f"Contact '{name}' added successfully!"
 
 
 @input_error
 def change_contact(args, book: AddressBook) -> str:
-    name, old_number, new_number = args
-    print(name, old_number, new_number)
+    *name_parts, old_number, new_number = args
+    name = " ".join(name_parts)
+
     record = book.find(name)
     if record:
         record.edit_phone(old_number, new_number)
@@ -42,7 +75,7 @@ def change_contact(args, book: AddressBook) -> str:
 
 @input_error
 def show_phone(args, book: AddressBook) ->str:
-    name = args[0]
+    name = " ".join(args)
     record = book.find(name)
     if record:
         return f"{record.name.value}, phones: {', '.join(p.value for p in record.phones)}"
@@ -52,7 +85,9 @@ def show_phone(args, book: AddressBook) ->str:
 
 @input_error
 def add_birthday(args, book: AddressBook) :
-    name, birthday = args
+    *name_parts, birthday = args
+    name = " ".join(name_parts)
+
     record = book.find(name)
     if record:
         record.add_birthday(birthday)
@@ -62,7 +97,8 @@ def add_birthday(args, book: AddressBook) :
 
 @input_error
 def show_birthday(args, book: AddressBook):
-    name, *_ = args
+    name = " ".join(args)
+
     record = book.find(name)
 
     if record:
@@ -82,3 +118,50 @@ def birthdays(book: AddressBook):
         return "\n".join(f"{bp['name']} - {bp['congratulation_date']}" for bp in birthday_peoples)
     else:
         return "There are no birthdays this week"
+
+@input_error
+def add_email(args, book: AddressBook):
+    name = " ".join(args)
+
+    record = book.find(name)
+    if not record:
+        raise KeyError
+    
+    email = prompt_validated_input("Enter email (or press Enter to cancel): ",
+        lambda val: Email(val),
+        "Invalid email format")
+    
+    if email:
+        record.email = email
+        return f"Email for {name} added: {email}"
+    return "Email not added."
+
+
+def prompt_validated_input(prompt_text, validator, error_message="Invalid input. Try again.", skip_allowed=True):
+    while True:
+        value = input(prompt_text).strip()
+        if not value and skip_allowed:
+            return None
+        try:
+            return validator(value)
+        except ValueError as e:
+            print(f"{error_message} ({e})")
+            print("Try again or press Enter to skip.")
+
+@input_error
+def add_address(args, book: AddressBook):
+    name = " ".join(args)
+    if not name:
+        raise KeyError
+    
+    record = book.find(name)
+
+    if record:
+        address = input("Enter address (or press Enter to skip): ").strip()
+        if address:
+            record.add_address(address)
+            return 'Address added.'
+        else:
+            return 'Address skipped'
+    else:
+        raise KeyError
