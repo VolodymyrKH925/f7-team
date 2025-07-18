@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import command_handler as handler
 import pickle
 from notes import *
+import re
 from search_contacts import (
     search_contacts_by_name,
     search_contacts_by_phone,
@@ -12,7 +13,7 @@ from search_contacts import (
 )
 
 class Field:
-    def __init__(self, value):
+    def __init__(self, value: str):
         self.value = value
 
     def __str__(self):
@@ -31,7 +32,7 @@ class Phone(Field):
         super().__init__(value)
 
 class Birthday(Field):
-    def __init__(self, value):
+    def __init__(self, value: str):
         try:
             date = datetime.strptime(value, "%d.%m.%Y")
         except ValueError:
@@ -40,12 +41,32 @@ class Birthday(Field):
 
     def __str__(self):
         return self.value.strftime("%d.%m.%Y")
+    
+class Email(Field):
+    def __init__(self, value: str):
+        if not self.is_valid_email(value):
+            raise ValueError("Invalid email format")
+        super().__init__(value)
+
+    @staticmethod
+    def is_valid_email(email: str) -> bool:
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        return re.match(pattern, email) is not None
+
+class Address(Field):
+    def __init__(self, value: str):
+        super().__init__(value)
+
 
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
         self.birthday = None
+
+        # додано
+        self.email = None
+        self.address = None
 
     def add_phone(self, phone_number: str):
         self.phones.append(Phone(phone_number))
@@ -74,8 +95,28 @@ class Record:
     def add_birthday(self, value):
         self.birthday = Birthday(value)
 
+
+    def add_email(self, value):
+        self.email = Email(value)
+
+    def add_address(self, address):
+        # address = input("Enter address (or press Enter to skip): ").strip()
+        self.address = Address(address)
+
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        parts = [f"Contact name: {self.name.value}"]
+
+        if self.phones:
+            parts.append("phones: " + "; ".join(p.value for p in self.phones))
+        if self.email:
+            parts.append(f"Email: {self.email}")
+        if self.birthday:
+            parts.append(f"Birthday: {self.birthday}")
+        if self.address:
+            parts.append(f"Address: {self.address}")
+
+        return ', '.join(parts)
+
 
 class AddressBook(UserDict):
     def add_record(self, record: Record):
@@ -177,7 +218,7 @@ def search_menu(book):
             for r in results:
                 print_record(r)
         else:
-            print("❌ No matches found.")        
+            print("❌ No matches found.")
 
 def main():
     book = load_data()
@@ -197,8 +238,10 @@ def main():
         elif command == "hello":
             print("How can I help you?")
 
+        # elif command == "add":
+        #     print(handler.add_contact(args, book))
         elif command == "add":
-            print(handler.add_contact(args, book))
+            print(handler.add_contact(book))
 
         elif command == "change":
             print(handler.change_contact(args, book))
@@ -225,10 +268,19 @@ def main():
         elif command == "birthdays":
             print(handler.birthdays(book))
 
-        # notes commands
+        elif command == "add-email":
+            print(handler.add_email(args, book))
 
-        elif command == "search-note-text":
-            print(search_note_text(args, notes))
+        elif command == "add-address":
+            print(handler.add_address(args, book))
+
+
+        # search command
+        elif command == "search":
+            search_menu(book)  
+
+
+        # notes commands
         
         elif command == "add-note":
             print(add_note(args, notes))
