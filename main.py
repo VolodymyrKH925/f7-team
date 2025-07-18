@@ -12,7 +12,6 @@ from search_contacts import (
     search_contacts_by_address,
 )
 
-
 class Field:
     def __init__(self, value: str):
         self.value = value
@@ -221,7 +220,6 @@ def search_menu(book):
         else:
             print("❌ No matches found.")
 
-
 def main():
     book = load_data()
     # load notes
@@ -257,6 +255,9 @@ def main():
             else:
                 for record in book.values():
                     print(record)
+
+        elif command == "search":
+            search_menu(book)             
 
         elif command == "add-birthday":
             print(handler.add_birthday(args, book))
