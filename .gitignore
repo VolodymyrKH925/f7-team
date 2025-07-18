@@ -1,6 +1,9 @@
 .venv/
+venv/
 .env/
 build/
 __pycache__/
 *egg-info/
 .DS_Store
+note.pkl
+*.pkl
