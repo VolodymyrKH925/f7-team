@@ -67,6 +67,10 @@ class Record:
     def add_birthday(self, value):
         self.birthday = Birthday(value)
 
+    def remove_phone(self, phone_str: str):
+        self.phones = [p for p in self.phones if str(p) != phone_str]
+    
+
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
@@ -149,7 +153,8 @@ def main():
             print(handler.add_contact(args, book))
 
         elif command == "change":
-            print(handler.change_contact(args, book))
+            # print(handler.change_contact(args, book))
+            handler.change_contact(book)          
 
         elif command == "phone":
             print(handler.show_phone(args, book))
@@ -161,6 +166,9 @@ def main():
                 for record in book.values():
                     print(record)
 
+        elif command == "delete":
+            handler.delete_contact(book)         
+
         elif command == "add-birthday":
             print(handler.add_birthday(args, book))
 
@@ -170,7 +178,12 @@ def main():
         elif command == "birthdays":
             print(handler.birthdays(book))
 
+            
+
         # notes commands
+
+        elif command == "search-note-text":
+            print(search_note_text(args, notes))
         
         elif command == "add-note":
             print(add_note(args, notes))

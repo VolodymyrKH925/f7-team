@@ -1,4 +1,6 @@
 from main import AddressBook, Record
+from edit_contact import edit_contact
+from delete import handle_delete
 
 
 def input_error(func):
@@ -29,16 +31,19 @@ def add_contact(args, book: AddressBook):
     return message
 
 
-@input_error
-def change_contact(args, book: AddressBook) -> str:
-    name, old_number, new_number = args
-    print(name, old_number, new_number)
-    record = book.find(name)
-    if record:
-        record.edit_phone(old_number, new_number)
+# @input_error
+# def change_contact(args, book: AddressBook) -> str:
+#     name, old_number, new_number = args
+#     print(name, old_number, new_number)
+#     record = book.find(name)
+#     if record:
+#         record.edit_phone(old_number, new_number)
     
-    return "Contact updated."
+#     return "Contact updated."
 
+@input_error
+def change_contact(book: AddressBook):
+    edit_contact(book)
 
 @input_error
 def show_phone(args, book: AddressBook) ->str:
@@ -82,3 +87,7 @@ def birthdays(book: AddressBook):
         return "\n".join(f"{bp['name']} - {bp['congratulation_date']}" for bp in birthday_peoples)
     else:
         return "There are no birthdays this week"
+
+@input_error
+def delete_contact(book: AddressBook):
+    handle_delete(book)
