@@ -95,6 +95,17 @@ class NoteBook(UserDict):
             return "No notes yet."
         return "\n".join([f"{note_id}: {note}" for note_id, note in self.data.items()])
     
+    def find_by_text(self, text: str):
+        result = []
+
+        for note_id, note in self.data.items():
+            note_text_lower = note.text.lower()
+            search_text_lower = text.lower()
+
+            if search_text_lower in note_text_lower:
+                result.append(f"{note_id}: {note}")
+
+        return result
 
 def input_error(error_message="Something went wrong"):
     def decorator(func):
@@ -107,7 +118,14 @@ def input_error(error_message="Something went wrong"):
             
         return inner
     return decorator
-    
+
+@input_error("Usage: search-note-text [text]")
+def search_note_text(args, notes):
+    if not args:
+        raise ValueError
+    search_query = " ".join(args)
+    found = notes.find_by_text(search_query)
+    return "\n".join(str(note) for note in found) if found else "No notes containing that text."
 
 @input_error("Usage: add-note [text] #[tag1] #[tag2]")
 def add_note(args, notes):

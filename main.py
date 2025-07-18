@@ -171,6 +171,9 @@ def main():
             print(handler.birthdays(book))
 
         # notes commands
+
+        elif command == "search-note-text":
+            print(search_note_text(args, notes))
         
         elif command == "add-note":
             print(add_note(args, notes))
