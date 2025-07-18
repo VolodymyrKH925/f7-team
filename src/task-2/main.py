@@ -14,7 +14,7 @@ def get_upcoming_birthdays(users: List[Dict[str, str]], days_ahead: int) -> List
 
         days_until_birthday = (birthday_this_year - current_date).days
 
-        print(f"{user['name']} → {birthday_this_year} → через {days_until_birthday} днів")
+        print(f"{user['name']} → {birthday_this_year} → in {days_until_birthday} days")
 
         if days_until_birthday == days_ahead:
             upcoming_birthdays.append({
@@ -29,23 +29,23 @@ def get_upcoming_birthdays(users: List[Dict[str, str]], days_ahead: int) -> List
 
 if __name__ == "__main__":
     users = [
-        {"name": "Анна", "birthday": "1995.07.20"},
-        {"name": "Ігор", "birthday": "1990.09.22"},
-        {"name": "Олена", "birthday": "1988.07.19"},
-        {"name": "Марко", "birthday": "1992.11.17"},
+        {"name": "Hanna", "birthday": "1995.07.20"},
+        {"name": "Vova", "birthday": "1990.09.22"},
+        {"name": "Vlad", "birthday": "1988.07.19"},
+        {"name": "Yana", "birthday": "1992.11.17"},
     ]
 
     try:
-        days_input = int(input("Введіть кількість днів наперед для перевірки: "))
+        days_input = int(input("Enter the number of days in advance to check: "))
     except ValueError:
-        print("Будь ласка, введіть ціле число.")
+        print("Please enter a whole number.")
         exit(1)
 
     result = get_upcoming_birthdays(users, days_input)
 
-    print("\nРезультат:")
+    print("\nResult:")
     if result:
         for user in result:
             print(user)
     else:
-        print("Немає користувачів з днем народження через задану кількість днів.")
+        print("There are no users with birthdays in the specified number of days.")
