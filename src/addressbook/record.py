@@ -1,4 +1,5 @@
 from .fields import Name, Phone, Email, Birthday, Address
+from styles import print_contact
 
 class Record:
     def __init__(self, name):
@@ -43,6 +44,16 @@ class Record:
 
     def add_address(self, address):
         self.address = Address(address)
+
+    def pretty_print(self):
+        print()
+        print_contact({
+            "name": self.name.value,
+            "phones": [phone.value for phone in self.phones],
+            "email": getattr(self, "email", "No email"),
+            "birthday": getattr(self, "birthday", "No birthday"),
+            "address": getattr(self, "address", "No address"),
+        })
 
     def __str__(self):
         parts = [f"Contact name: {self.name.value}"]
