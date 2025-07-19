@@ -55,7 +55,13 @@ After launching, use the following commands:
 
 🔹 Contact Management  
 
-add-contact [name] [phone] [email] — Add a new contact
+add
+>[name]  
+>[phone]  
+>[email]  
+>[birthday]
+>[adress]  
+— Add a new contact
 
 delete-contact [name] — Delete a contact
 
