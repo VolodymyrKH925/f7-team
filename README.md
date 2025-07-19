@@ -59,7 +59,7 @@ add
 >[name]  
 >[phone]  
 >[email]  
->[birthday]
+>[birthday]  
 >[adress]  
 — Add a new contact
 
