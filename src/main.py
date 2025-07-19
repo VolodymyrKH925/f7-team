@@ -82,7 +82,10 @@ def main():
 
     print("Welcome to the assistant bot!")
     while True:
-        user_input = prompt("Enter a command: ", completer=completer)
+        user_input = None
+        while not user_input or not user_input.strip(): 
+            user_input = prompt("Enter a command: ", completer=completer)
+
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
