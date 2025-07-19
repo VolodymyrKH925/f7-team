@@ -21,13 +21,17 @@ cd your_repository
 ```
 
 ### 2. Create and Activate a Virtual Environment
-```bash
-<details> <summary>macOS / Linux</summary>
 
+<details> <summary>macOS / Linux</summary>
+  
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
+
 </details> <details> <summary>Windows</summary>
 
+```bash
 python -m venv venv
 venv\Scripts\activate
 </details>
