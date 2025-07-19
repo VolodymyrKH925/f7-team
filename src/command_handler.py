@@ -3,6 +3,7 @@ from addressbook.record import Record
 from addressbook.fields import Email
 from edit_contact import edit_contact
 from delete import handle_delete
+from prompt_toolkit import HTML, print_formatted_text
 
 
 def input_error(error_message="Something went wrong"):
@@ -106,16 +107,22 @@ def show_birthday(args, book: AddressBook):
     else:
         raise KeyError
 
-@input_error("Usage: birthday [days_ahead]")
+@input_error("Usage: birthdays [days_ahead]")
 def birthdays(args: int, book: AddressBook):
     days_ahead = int(args[0])
     if not len(book):
-        return "No contacts entered!"
+        print_formatted_text(HTML('<ansired>No contacts entered!</ansired>'))
+        return
+
     birthday_peoples = book.get_upcoming_birthdays(days_ahead)
-    if len(birthday_peoples):
-        return "\n".join(f"{bp['name']} - {bp['congratulation_date']}" for bp in birthday_peoples)
+    if birthday_peoples:
+        print_formatted_text(HTML('<ansiblue>Upcoming birthdays:</ansiblue>'))
+        for bp in birthday_peoples:
+            print_formatted_text(HTML(
+                f"<ansigreen>{bp['name']}</ansigreen> - <ansiyellow>{bp['congratulation_date']}</ansiyellow>"
+            ))
     else:
-        return "There are no birthdays this period"
+        print_formatted_text(HTML('<ansired>There are no birthdays this period</ansired>'))
 
 
 @input_error("Usage: delete")

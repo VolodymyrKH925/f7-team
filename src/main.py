@@ -125,7 +125,7 @@ def main():
             print(handler.show_birthday(args, book))
 
         elif command == "birthdays":
-            print(handler.birthdays(args, book))
+            handler.birthdays(args, book)
 
         elif command == "add-email":
             print(handler.add_email(args, book))
