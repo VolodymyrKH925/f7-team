@@ -2,6 +2,9 @@ from addressbook.book import AddressBook
 import command_handler as handler
 import pickle
 from notes import *
+from autocomplete import CommandCompleter, show_help
+from prompt_toolkit import prompt
+from addressbook.utils import save_data
 
 # from typing import List, Dict
 from search_contacts import (
@@ -23,10 +26,6 @@ def load_data(filename="addressbook.pkl"):
             return pickle.load(f)
     except FileNotFoundError:
         return AddressBook()
-
-def save_data(book, filename="addressbook.pkl"):
-    with open(filename, "wb") as f:
-        pickle.dump(book, f)
 
  # Пошук у книзі контактів
 
@@ -79,9 +78,11 @@ def main():
     # load notes
     notes = load_data_notes()
 
+    completer = CommandCompleter()
+
     print("Welcome to the assistant bot!")
     while True:
-        user_input = input("Enter a command: ")
+        user_input = prompt("Enter a command: ", completer=completer)
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
@@ -91,6 +92,9 @@ def main():
 
         elif command == "hello":
             print("How can I help you?")
+
+        elif command == "help":
+            show_help()
 
         elif command == "add":
             print(handler.add_contact(book))
@@ -106,7 +110,7 @@ def main():
                 print("No contacts entered!")
             else:
                 for record in book.values():
-                    print(record)
+                    record.pretty_print()
 
         elif command == "delete":
             handler.delete_contact(book)         
@@ -147,7 +151,7 @@ def main():
             print(search_note_tag(args, notes))
         
         elif command == "search-note-text":
-            print(search_note_text(args, notes))
+            search_note_text(args, notes)
 
         elif command == "sort-by-tag":
             print(sort_by_tag(notes))

@@ -1,9 +1,11 @@
 from collections import UserDict
 from .record import Record
 from datetime import datetime
-
+from addressbook.utils import autosave_contacts
 
 class AddressBook(UserDict):
+
+    @autosave_contacts
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 

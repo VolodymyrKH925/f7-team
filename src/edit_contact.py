@@ -1,5 +1,5 @@
 from datetime import datetime
-from main import save_data
+from addressbook.utils import save_data
 from addressbook.book import AddressBook
 
 def edit_contact(book: AddressBook):

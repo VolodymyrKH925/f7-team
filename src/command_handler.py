@@ -62,6 +62,8 @@ def add_contact(book: AddressBook):
     
     book.add_record(record)
 
+    record.pretty_print()
+
     return f"Contact '{name}' added successfully!"
 
 @input_error()
