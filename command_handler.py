@@ -2,20 +2,21 @@ from main import AddressBook, Record, Email
 from edit_contact import edit_contact
 from delete import handle_delete
 
-def input_error(func):
-    def inner(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except KeyError:
-            return "Contact not found."
-        except ValueError:
-            return "Enter the current arguments for the command"
-        except IndexError:
-            return "Enter user name."
-    return inner
+
+def input_error(error_message="Something went wrong"):
+    def decorator(func):
+        def inner(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            
+            except (ValueError, IndexError, KeyError):
+                return error_message
+            
+        return inner
+    return decorator
 
 
-@input_error
+@input_error()
 def add_contact(book: AddressBook):
     name = input('Enter contact name: ').strip()
     if not name:
@@ -61,20 +62,11 @@ def add_contact(book: AddressBook):
 
     return f"Contact '{name}' added successfully!"
 
-@input_error
-def change_contact(args, book: AddressBook) -> str:
-    *name_parts, old_number, new_number = args
-    name = " ".join(name_parts)
-
-    record = book.find(name)
-    if record:
-        record.edit_phone(old_number, new_number)
-
-@input_error
+@input_error()
 def change_contact(book: AddressBook):
     edit_contact(book)
 
-@input_error
+@input_error("Usage: phone [name]")
 def show_phone(args, book: AddressBook) ->str:
     name = " ".join(args)
     record = book.find(name)
@@ -84,7 +76,7 @@ def show_phone(args, book: AddressBook) ->str:
         raise KeyError
 
 
-@input_error
+@input_error("Usage: add-birthday [name] [DD.MM.YYYY]")
 def add_birthday(args, book: AddressBook) :
     *name_parts, birthday = args
     name = " ".join(name_parts)
@@ -96,7 +88,7 @@ def add_birthday(args, book: AddressBook) :
     else:
         raise KeyError
 
-@input_error
+@input_error("Usage: show-birthday [name]")
 def show_birthday(args, book: AddressBook):
     name = " ".join(args)
 
@@ -110,22 +102,23 @@ def show_birthday(args, book: AddressBook):
     else:
         raise KeyError
 
-@input_error
-def birthdays(book: AddressBook):
+@input_error("Usage: birthday [days_ahead]")
+def birthdays(args: int, book: AddressBook):
+    days_ahead = args
     if not len(book):
         return "No contacts entered!"
-    birthday_peoples = book.get_upcoming_birthdays()
+    birthday_peoples = book.get_upcoming_birthdays(days_ahead)
     if len(birthday_peoples):
         return "\n".join(f"{bp['name']} - {bp['congratulation_date']}" for bp in birthday_peoples)
     else:
-        return "There are no birthdays this week"
+        return "There are no birthdays this period"
 
 
-@input_error
+@input_error("Usage: delete")
 def delete_contact(book: AddressBook):
     handle_delete(book)
     
-@input_error
+@input_error("Usage: add-email [name] [email]")
 def add_email(args, book: AddressBook):
     name = " ".join(args)
 
@@ -154,7 +147,7 @@ def prompt_validated_input(prompt_text, validator, error_message="Invalid input.
             print(f"{error_message} ({e})")
             print("Try again or press Enter to skip.")
 
-@input_error
+@input_error("Usage: add-address [name]")
 def add_address(args, book: AddressBook):
     name = " ".join(args)
     if not name:

@@ -1,9 +1,11 @@
 from collections import UserDict
-from datetime import datetime, timedelta
+from datetime import datetime
 import command_handler as handler
 import pickle
 from notes import *
 import re
+from datetime import datetime
+from typing import List, Dict
 from search_contacts import (
     search_contacts_by_name,
     search_contacts_by_phone,
@@ -136,30 +138,22 @@ class AddressBook(UserDict):
             return
         raise KeyError(f"Contact '{name}' not found")
     
-    def get_upcoming_birthdays(self):
-        this_week_birthdays = []
+    def get_upcoming_birthdays(self, days_ahead: int):
         today = datetime.today().date()
-
-        for user in self.data.values():
-            if not user.birthday:
+        result = []
+        for record in self.data.values():
+            next_bday = record.get_next_birthday_date()
+            if not next_bday:
                 continue
-
-            birthday_this_year = user.birthday.value.replace(year=today.year).date()
-            if birthday_this_year < today:
-                birthday_this_year = birthday_this_year.replace(year=today.year + 1)
-            
-            delta = birthday_this_year - today
-
-            if timedelta(days=0) <= delta <= timedelta(days=7):
-                if birthday_this_year.weekday() > 4:
-                    weekend_delta = 7 - birthday_this_year.weekday()
-                    birthday_this_year = birthday_this_year + timedelta(days = weekend_delta)
-                
-                this_week_birthdays.append({
-                    "name": user.name.value,
-                    "congratulation_date": birthday_this_year.strftime("%d.%m.%Y")
+            days_until = (next_bday - today).days
+            if days_until == days_ahead:
+                result.append({
+                    "name": record.name.value,
+                    "birthday": record.birthday.value.strftime("%d.%m.%Y"),
+                    "in_days": days_ahead,
+                    "congratulation_date": next_bday.strftime("%d.%m.%Y")
                 })
-        return this_week_birthdays
+        return result
 
 def parse_input(user_input):
     cmd, *args = user_input.split()
@@ -240,13 +234,10 @@ def main():
         elif command == "hello":
             print("How can I help you?")
 
-        # elif command == "add":
-        #     print(handler.add_contact(args, book))
         elif command == "add":
             print(handler.add_contact(book))
 
         elif command == "change":
-            # print(handler.change_contact(args, book))
             handler.change_contact(book)          
 
         elif command == "phone":
@@ -272,7 +263,7 @@ def main():
             print(handler.show_birthday(args, book))
 
         elif command == "birthdays":
-            print(handler.birthdays(book))
+            print(handler.birthdays(args, book))
 
         elif command == "add-email":
             print(handler.add_email(args, book))
@@ -288,9 +279,6 @@ def main():
         elif command == "delete-note":
             print(delete_note(args, notes))
 
-        elif command == "search-note-tag":
-            print(search_note_tag(args, notes))
-
         elif command == "show-notes":
             print(show_notes(notes))
 
@@ -299,6 +287,9 @@ def main():
 
         elif command == "search-note-tag":
             print(search_note_tag(args, notes))
+        
+        elif command == "search-note-text":
+            print(search_note_text(args, notes))
 
         elif command == "sort-by-tag":
             print(sort_by_tag(notes))
