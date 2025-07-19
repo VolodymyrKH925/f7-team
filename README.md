@@ -55,17 +55,21 @@ After launching, use the following commands:
 
 🔹 Contact Management  
 
-add
+add — Add a new contact
 >[name]  
 >[phone]  
 >[email]  
 >[birthday]  
 >[adress]  
-— Add a new contact
 
-delete-contact [name] — Delete a contact
+delete — Delete a contact
+>[name]
+>[filed]
 
-edit-contact [name] [field] [new_value] — Edit a contact's field
+change — Edit a contact's field
+>[name]
+>[field]
+>[new_value]
 
 🔹 Notes
 add-note [text] #[tag] — Add a note with an optional tag
