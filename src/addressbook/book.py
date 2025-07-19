@@ -28,12 +28,12 @@ class AddressBook(UserDict):
             next_bday = record.get_next_birthday_date().date()
             if not next_bday:
                 continue
-
             next_bday = next_bday.replace(year=today.year)
             if next_bday < today:
                 next_bday = next_bday.replace(year=today.year + 1)
-                
+
             days_until = (next_bday - today).days
+
             if days_until <= days_ahead:
                 result.append({
                     "name": record.name.value,
