@@ -1,6 +1,7 @@
 from collections import UserDict
-from prompt_toolkit import prompt
+from prompt_toolkit import prompt, print_formatted_text, HTML
 import pickle
+from styles import print_note_colored
 
 def save_data_notes(notes, filename="notes.pkl"):
     with open(filename, "wb") as f:
@@ -20,7 +21,7 @@ class Note:
         self.tags = tags if tags else []
 
     def __str__(self):
-        tag_str = ", ".join(self.tags)
+        tag_str = ", ".join(self.tags) if self.tags else "no tags"
         return f"Note: {self.text} | Tags: {tag_str}"
     
     
@@ -72,24 +73,26 @@ class NoteBook(UserDict):
 
     
     def sort_by_tags(self):
+        if not self.data:
+            raise ValueError
 
-        tagged_notes = []
-        for note_id, note in self.data.items():
+        tagged = []
+        for nid, note in self.data.items():
             if note.tags:
-                for tag in note.tags:
-                    tagged_notes.append((tag.lower(), note_id, note))
+                for t in note.tags:
+                    tagged.append((t.lower(), nid, note))
             else:
-                tagged_notes.append(("", note_id, note))
+                tagged.append(("", nid, note))
 
-        tagged_notes.sort(key=lambda x: (x[0] == "", x[0], x[1]))
+        tagged.sort(key=lambda x: (x[0] == "", x[0], x[1]))
 
-        result = []
-        for tag, note_id, note in tagged_notes:
-            tag_display = tag if tag else "No tag"
-            result.append(f"[{tag_display}] {note_id}: {note}")
+        for tag, nid, note in tagged:
+            label = tag if tag else "No tag"
+            print_formatted_text(HTML(f"<ansimagenta>[{label}]</ansimagenta>"))
+            print_note_colored(nid, note)
 
-        return "\n".join(result)
-
+        return f"Listed {len(self)} note(s) sorted by tag"
+        
     def __str__(self):
         if not self.data:
             return "No notes yet."
@@ -133,14 +136,21 @@ def delete_note(args, notes):
 @input_error("Usage: search-note-tag [#tag]")
 def search_note_tag(args, notes):
     tag = args[0].lstrip("#")
-    found = notes.find_by_tag(tag)
-    return "\n".join(str(note) for note in found) if found else "No notes with this tag."
+    found = [(nid, n) for nid, n in notes.data.items() if tag in n.tags]
+    if not found:
+        return "No notes with this tag."
+    
+    for nid, n in found:
+        print_note_colored(nid, n)
+    return f"Found: {len(found)} note(s)"
 
 @input_error("No notes saved.")
 def show_notes(notes):
     if not notes.data:
         raise ValueError
-    return str(notes)
+    for nid, note in notes.data.items():
+        print_note_colored(nid, note)
+    return f"Total notes: {len(notes)}"
 
 @input_error("Usage: edit-note [note_id]")
 def edit_note(args, notes):

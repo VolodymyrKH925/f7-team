@@ -11,6 +11,16 @@ from search_contacts import (
     search_contacts_by_birthday,
     search_contacts_by_address,
 )
+from autocomplete import CommandCompleter, show_help
+from prompt_toolkit import prompt
+from styles import print_contact
+
+def autosave_contacts(method):
+    def wrapper(self, *args, **kwargs):
+        result = method(self, *args, **kwargs)
+        save_data(self)
+        return result
+    return wrapper
 
 class Field:
     def __init__(self, value: str):
@@ -64,7 +74,6 @@ class Record:
         self.phones = []
         self.birthday = None
 
-        # додано
         self.email = None
         self.address = None
 
@@ -79,7 +88,7 @@ class Record:
         raise ValueError(f"Phone number {phone_number} not found")
     
     def edit_phone(self, old_phone: str, new_phone: str):
-        new_phone_obj = Phone(new_phone)  # Валідуємо тут
+        new_phone_obj = Phone(new_phone) 
         for i, phone in enumerate(self.phones):
             if phone.value == old_phone:
                 self.phones[i] = new_phone_obj
@@ -95,15 +104,21 @@ class Record:
     def add_birthday(self, value):
         self.birthday = Birthday(value)
 
-    def remove_phone(self, phone_str: str):
-        self.phones = [p for p in self.phones if str(p) != phone_str]
-
     def add_email(self, value):
         self.email = Email(value)
 
     def add_address(self, address):
-        # address = input("Enter address (or press Enter to skip): ").strip()
         self.address = Address(address)
+
+    def pretty_print(self):
+        print()
+        print_contact({
+            "name": self.name.value,
+            "phones": [phone.value for phone in self.phones],
+            "email": getattr(self, "email", "No email"),
+            "birthday": getattr(self, "birthday", "No birthday"),
+            "address": getattr(self, "address", "No address"),
+        })
 
     def __str__(self):
         parts = [f"Contact name: {self.name.value}"]
@@ -121,6 +136,7 @@ class Record:
 
 
 class AddressBook(UserDict):
+    @autosave_contacts
     def add_record(self, record: Record):
         self.data[record.name.value] = record
 
@@ -130,6 +146,7 @@ class AddressBook(UserDict):
         else:
             return None
 
+    @autosave_contacts
     def delete(self, name: str):
         if name in self.data:
             self.data.pop(name)
@@ -224,12 +241,13 @@ def search_menu(book):
 
 def main():
     book = load_data()
-    # load notes
     notes = load_data_notes()
+
+    completer = CommandCompleter()
 
     print("Welcome to the assistant bot!")
     while True:
-        user_input = input("Enter a command: ")
+        user_input = prompt("Enter a command: ", completer=completer)
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
@@ -240,13 +258,13 @@ def main():
         elif command == "hello":
             print("How can I help you?")
 
-        # elif command == "add":
-        #     print(handler.add_contact(args, book))
+        elif command == "help":
+            show_help()
+
         elif command == "add":
             print(handler.add_contact(book))
 
         elif command == "change":
-            # print(handler.change_contact(args, book))
             handler.change_contact(book)          
 
         elif command == "phone":
@@ -257,7 +275,7 @@ def main():
                 print("No contacts entered!")
             else:
                 for record in book.values():
-                    print(record)
+                    record.pretty_print()
 
         elif command == "delete":
             handler.delete_contact(book)         
@@ -296,9 +314,6 @@ def main():
 
         elif command == "edit-note":
             print(edit_note(args, notes))
-
-        elif command == "search-note-tag":
-            print(search_note_tag(args, notes))
 
         elif command == "sort-by-tag":
             print(sort_by_tag(notes))
