@@ -53,7 +53,8 @@ python src/main.py
 ## 💡 Usage
 After launching, use the following commands:
 
-🔹 Contact Management
+🔹 Contact Management  
+
 add-contact [name] [phone] [email] — Add a new contact
 
 delete-contact [name] — Delete a contact
