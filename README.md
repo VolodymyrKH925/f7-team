@@ -63,12 +63,12 @@ add — Add a new contact
 >[adress]  
 
 delete — Delete a contact
->[name]
+>[name]  
 >[filed]
 
 change — Edit a contact's field
->[name]
->[field]
+>[name]  
+>[field]  
 >[new_value]
 
 🔹 Notes
