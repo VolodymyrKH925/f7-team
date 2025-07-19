@@ -1,11 +1,9 @@
-from collections import UserDict
-from datetime import datetime
+from addressbook.book import AddressBook
 import command_handler as handler
 import pickle
 from notes import *
-import re
-from datetime import datetime
-from typing import List, Dict
+
+# from typing import List, Dict
 from search_contacts import (
     search_contacts_by_name,
     search_contacts_by_phone,
@@ -13,147 +11,6 @@ from search_contacts import (
     search_contacts_by_birthday,
     search_contacts_by_address,
 )
-
-class Field:
-    def __init__(self, value: str):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
-
-class Name(Field):
-    def __init__(self, value: str):
-        if type(value) != str:
-            raise ValueError("Name value isn't correct")
-        super().__init__(value)
-
-class Phone(Field):
-    def __init__(self, value: str):
-        if not (value.isdigit() and len(value) == 10):
-            raise ValueError("Phone value must contain 10 digits")
-        super().__init__(value)
-
-class Birthday(Field):
-    def __init__(self, value: str):
-        try:
-            date = datetime.strptime(value, "%d.%m.%Y")
-        except ValueError:
-            raise ValueError("Invalid date format. Use DD.MM.YYYY")
-        super().__init__(date)
-
-    def __str__(self):
-        return self.value.strftime("%d.%m.%Y")
-    
-class Email(Field):
-    def __init__(self, value: str):
-        if not self.is_valid_email(value):
-            raise ValueError("Invalid email format")
-        super().__init__(value)
-
-    @staticmethod
-    def is_valid_email(email: str) -> bool:
-        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        return re.match(pattern, email) is not None
-
-class Address(Field):
-    def __init__(self, value: str):
-        super().__init__(value)
-
-
-class Record:
-    def __init__(self, name):
-        self.name = Name(name)
-        self.phones = []
-        self.birthday = None
-
-        # додано
-        self.email = None
-        self.address = None
-
-    def add_phone(self, phone_number: str):
-        self.phones.append(Phone(phone_number))
-    
-    def remove_phone(self, phone_number: str):
-        for phone in self.phones:
-             if phone.value == phone_number:
-                self.phones.remove(phone)
-                return
-        raise ValueError(f"Phone number {phone_number} not found")
-    
-    def edit_phone(self, old_phone: str, new_phone: str):
-        new_phone_obj = Phone(new_phone)  # Валідуємо тут
-        for i, phone in enumerate(self.phones):
-            if phone.value == old_phone:
-                self.phones[i] = new_phone_obj
-                return
-        raise ValueError(f"number {old_phone} not found")
-
-    def find_phone(self, phone_number: str):
-        for phone in self.phones:
-            if phone.value == phone_number:
-                return phone.value
-        raise ValueError("Value not found")
-    
-    def add_birthday(self, value):
-        self.birthday = Birthday(value)
-
-    def remove_phone(self, phone_str: str):
-        self.phones = [p for p in self.phones if str(p) != phone_str]
-
-    def add_email(self, value):
-        self.email = Email(value)
-
-    def add_address(self, address):
-        # address = input("Enter address (or press Enter to skip): ").strip()
-        self.address = Address(address)
-
-    def __str__(self):
-        parts = [f"Contact name: {self.name.value}"]
-
-        if self.phones:
-            parts.append("phones: " + "; ".join(p.value for p in self.phones))
-        if self.email:
-            parts.append(f"Email: {self.email}")
-        if self.birthday:
-            parts.append(f"Birthday: {self.birthday}")
-        if self.address:
-            parts.append(f"Address: {self.address}")
-
-        return ', '.join(parts)
-
-
-class AddressBook(UserDict):
-    def add_record(self, record: Record):
-        self.data[record.name.value] = record
-
-    def find(self, name: str):
-        if name in self.data:
-            return self.data[name]
-        else:
-            return None
-
-    def delete(self, name: str):
-        if name in self.data:
-            self.data.pop(name)
-            return
-        raise KeyError(f"Contact '{name}' not found")
-    
-    def get_upcoming_birthdays(self, days_ahead: int):
-        today = datetime.today().date()
-        result = []
-        for record in self.data.values():
-            next_bday = record.get_next_birthday_date()
-            if not next_bday:
-                continue
-            days_until = (next_bday - today).days
-            if days_until == days_ahead:
-                result.append({
-                    "name": record.name.value,
-                    "birthday": record.birthday.value.strftime("%d.%m.%Y"),
-                    "in_days": days_ahead,
-                    "congratulation_date": next_bday.strftime("%d.%m.%Y")
-                })
-        return result
 
 def parse_input(user_input):
     cmd, *args = user_input.split()
@@ -172,6 +29,7 @@ def save_data(book, filename="addressbook.pkl"):
         pickle.dump(book, f)
 
  # Пошук у книзі контактів
+
 def print_record(record):
     print(f"\n👤 {record.name}")
     print(f"📞 Phones: {', '.join(p.value for p in record.phones)}")

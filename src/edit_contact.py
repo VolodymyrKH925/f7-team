@@ -1,5 +1,6 @@
 from datetime import datetime
-from main import AddressBook, save_data
+from main import save_data
+from addressbook.book import AddressBook
 
 def edit_contact(book: AddressBook):
     print("\n=== Contact Editing Mode ===")

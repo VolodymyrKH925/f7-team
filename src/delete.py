@@ -1,4 +1,5 @@
-from main import AddressBook, save_data
+from main import save_data
+from addressbook.book import AddressBook
 
 def handle_delete(book: AddressBook):
     print("\n=== Delete Contact Mode ===")

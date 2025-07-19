@@ -1,4 +1,6 @@
-from main import AddressBook, Record, Email
+from addressbook.book import AddressBook
+from addressbook.record import Record
+from addressbook.fields import Email
 from edit_contact import edit_contact
 from delete import handle_delete
 
