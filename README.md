@@ -66,7 +66,7 @@ add-note [text] #[tag] — Add a note with an optional tag
 
 search-note-text [text] — Search notes by content
 
-search-note-tag #[tag] — Search notes by tag
+search-note-tag [tag] — Search notes by tag
 
 🔹 Birthdays
 birthdays [days_ahead] — Show upcoming birthdays within the next X days
@@ -79,7 +79,12 @@ exit — Exit the program
 ## 📌 Example Session
 bash
 
-> add-contact Alice +380501234567 alice@email.com
+> add
+> Alice
+> +380501234567
+> alice@email.com
+> 22.07.2000
+> Street 12
 Contact Alice added.
 
 > birthdays 7
