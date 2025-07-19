@@ -34,6 +34,11 @@ class Record:
     
     def add_birthday(self, value):
         self.birthday = Birthday(value)
+    
+    def get_next_birthday_date(self):
+        if self.birthday:
+            return self.birthday.value
+        return None
 
     def remove_phone(self, phone_str: str):
         self.phones = [p for p in self.phones if str(p) != phone_str]

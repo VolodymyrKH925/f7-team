@@ -106,7 +106,7 @@ def show_birthday(args, book: AddressBook):
 
 @input_error("Usage: birthday [days_ahead]")
 def birthdays(args: int, book: AddressBook):
-    days_ahead = args
+    days_ahead = int(args[0])
     if not len(book):
         return "No contacts entered!"
     birthday_peoples = book.get_upcoming_birthdays(days_ahead)
